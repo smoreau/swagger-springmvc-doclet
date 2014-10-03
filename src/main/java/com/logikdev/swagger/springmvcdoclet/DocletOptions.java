@@ -26,6 +26,7 @@ public class DocletOptions {
     private boolean parseModels = true;
     private Recorder recorder = new ObjectMapperRecorder();
     private Translator translator;
+    private boolean includeSwaggerUi = true;
 
     public DocletOptions() {
         excludeAnnotationClasses = new ArrayList<String>();
@@ -70,9 +71,11 @@ public class DocletOptions {
             } else if (option[0].equals("-disableModels")) {
                 parsedOptions.parseModels = false;
             } else if (option[0].equals("-errorTags")) {
-                parsedOptions.errorTags.addAll(asList(copyOfRange(option, 1, option.length)));;
+                parsedOptions.errorTags.addAll(asList(copyOfRange(option, 1, option.length)));
             } else if (option[0].equals("-typesToTreatAsOpaque")) {
-                parsedOptions.typesToTreatAsOpaque.addAll(asList(copyOfRange(option, 1, option.length)));;
+                parsedOptions.typesToTreatAsOpaque.addAll(asList(copyOfRange(option, 1, option.length)));
+            } else if (option[0].equals("-excludeSwaggerUi")) {
+                parsedOptions.includeSwaggerUi = false;
             }
         }
         return parsedOptions;
@@ -131,5 +134,9 @@ public class DocletOptions {
         this.translator = translator;
         return this;
     }
+
+	public boolean isIncludeSwaggerUi() {
+		return includeSwaggerUi;
+	}
 
 }
