@@ -1,12 +1,11 @@
 package com.logikdev.swagger.springmvcdoclet.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
-import com.logikdev.swagger.springmvcdoclet.parser.AnnotationHelper;
+import static com.google.common.base.Strings.emptyToNull;
 
 import java.util.List;
 
-import static com.google.common.base.Strings.emptyToNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 
 public class Operation {
 
@@ -27,7 +26,7 @@ public class Operation {
     public Operation(Method method) {
         this.httpMethod = method.getMethod();
         this.nickname = emptyToNull(method.getMethodName());
-        this.responseClass = emptyToNull(AnnotationHelper.typeOf(method.getReturnType()));
+        this.responseClass = emptyToNull(method.getReturnType());
         this.parameters = method.getParameters().isEmpty() ? null : method.getParameters();
         this.responseMessages = method.getResponseMessages().isEmpty() ? null : method.getResponseMessages();
         this.summary = emptyToNull(method.getFirstSentence());

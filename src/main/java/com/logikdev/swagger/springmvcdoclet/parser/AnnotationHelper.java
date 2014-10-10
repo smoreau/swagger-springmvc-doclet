@@ -8,6 +8,7 @@ import com.logikdev.swagger.springmvcdoclet.DocletOptions;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationValue;
 import com.sun.javadoc.Parameter;
+import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.Type;
 
 public class AnnotationHelper {
@@ -15,6 +16,7 @@ public class AnnotationHelper {
     private static final String SPRING_MVC_PATH = "org.springframework.web.bind.annotation.RequestMapping";      // @RequestMapping
     private static final String SPRING_MVC_PATH_PARAM = "org.springframework.web.bind.annotation.PathVariable";  // @PathVariable
     private static final String SPRING_MVC_QUERY_PARAM = "org.springframework.web.bind.annotation.RequestParam"; // @RequestParam
+    private static final String SPRING_MVC_RESPONSE_ENTITY = "org.springframework.http.ResponseEntity";
     private static final String JERSEY_MULTIPART_FORM_PARAM = "com.sun.jersey.multipart.FormDataParam";
     
     @SuppressWarnings("serial")
@@ -50,21 +52,25 @@ public class AnnotationHelper {
     /**
      * Determines the String representation of the object Type.
      */
-    public static String typeOf(String javaType) {
+    public static String typeOf(Type javaType) {
+    	String qualifiedTypeName = javaType.qualifiedTypeName();
+    	
         String type;
-        if (javaType.startsWith("java.lang.")) {
-            int i = javaType.lastIndexOf(".");
-            type = javaType.substring(i + 1).toLowerCase();
-        } else if (PRIMITIVES.contains(javaType.toLowerCase())) {
-            type = javaType.toLowerCase();
-        } else if (javaType.equals("java.util.Date")) {
+        if (qualifiedTypeName.startsWith("java.lang.")) {
+            int i = qualifiedTypeName.lastIndexOf(".");
+            type = qualifiedTypeName.substring(i + 1).toLowerCase();
+        } else if (PRIMITIVES.contains(qualifiedTypeName.toLowerCase())) {
+            type = qualifiedTypeName.toLowerCase();
+        } else if (qualifiedTypeName.equals("java.util.Date")) {
             type = "Date";
+        } else if (SPRING_MVC_RESPONSE_ENTITY.equals(qualifiedTypeName))  {
+        	type = typeOf(getTypeArgument(javaType, 0));
         } else {
-            int i = javaType.lastIndexOf(".");
+            int i = qualifiedTypeName.lastIndexOf(".");
             if (i >= 0) {
-                type = javaType.substring(i + 1);
+                type = qualifiedTypeName.substring(i + 1);
             } else {
-                type = javaType;
+                type = qualifiedTypeName;
             }
         }
         if (type.equalsIgnoreCase("integer")) {
@@ -107,7 +113,16 @@ public class AnnotationHelper {
     }
 
     public static boolean isPrimitive(Type type) {
-        return PRIMITIVES.contains(typeOf(type.qualifiedTypeName()));
+        return PRIMITIVES.contains(typeOf(type));
+    }
+    
+    public static Type getTypeArgument(Type type, int index) {
+    	ParameterizedType paramType = type.asParameterizedType();
+    	Type[] typeArg = paramType.typeArguments();
+    	if (typeArg.length > index) {
+    		return typeArg[index];
+    	}
+    	return null;
     }
 
     public static class ExcludedAnnotations implements Predicate<AnnotationDesc> {

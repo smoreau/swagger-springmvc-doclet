@@ -11,7 +11,7 @@ public class NameBasedTranslator implements Translator {
 
     @Override
     public OptionalName typeName(Type type) {
-        return presentOrMissing(AnnotationHelper.typeOf(type.qualifiedTypeName()));
+        return presentOrMissing(AnnotationHelper.typeOf(type));
     }
 
     @Override
